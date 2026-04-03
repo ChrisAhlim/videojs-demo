@@ -1,0 +1,158 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+
+    <!-- Bootstrap -->
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+
+    <!-- Video.js core -->
+    <link
+      href="https://cdn.jsdelivr.net/npm/video.js/dist/video-js.css"
+      rel="stylesheet"
+    />
+    <script src="https://cdn.jsdelivr.net/npm/video.js/dist/video.min.js"></script>
+
+    <!-- HLS support -->
+    <script src="https://cdn.jsdelivr.net/npm/videojs-http-streaming/dist/videojs-http-streaming.min.js"></script>
+
+    <!-- Quality menu plugin -->
+    <script src="https://cdn.jsdelivr.net/npm/videojs-contrib-quality-menu/dist/videojs-contrib-quality-menu.min.js"></script>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
+
+    <title>Video.js Player Demo</title>
+
+    <style>
+      body {
+        background: #111;
+        color: #fff;
+        font-family: Arial, sans-serif;
+      }
+
+      .video-wrapper {
+        position: relative;
+        width: 100%;
+      }
+
+      #statsBox {
+        position: absolute;
+        top: 8px;
+        left: 8px;
+        background: rgba(0, 0, 0, 0.8);
+        padding: 8px 12px;
+        font-size: 13px;
+        border-radius: 5px;
+        color: rgb(166, 255, 0);
+        z-index: 100;
+      }
+    </style>
+  </head>
+
+  <body>
+    <div class="container py-4">
+      <div class="row justify-content-center mb-3">
+        <div class="col-8">
+          <h3>VIDEO JS v8 PLAYER</h3>
+          <br />
+          <p>Replace the URL and Play</p>
+        </div>
+      </div>
+
+      <!-- INPUT -->
+      <div class="row justify-content-center mb-3">
+        <div class="col-lg-8">
+          <div class="input-group">
+            <input
+              id="srcInput"
+              type="text"
+              class="form-control"
+              value="https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8"
+            />
+            <button class="btn btn-primary" onclick="loadStream()">Play</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- VIDEO -->
+      <div class="row justify-content-center">
+        <div class="col-lg-8">
+          <div class="video-wrapper">
+            <div id="statsBox">Loading stats...</div>
+
+            <video
+              id="videojs-player"
+              class="video-js vjs-default-skin w-100"
+              controls
+              autoplay
+              muted
+              data-setup="{}"
+            >
+              <source
+                src="https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8"
+                type="application/x-mpegURL"
+              />
+            </video>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      const player = videojs("videojs-player");
+
+      // ============================
+      // QUALITY MENU INITIALIZATION
+      // ============================
+      player.qualityMenu();
+
+      // ============================
+      // LOAD STREAM FROM INPUT
+      // ============================
+      function loadStream() {
+        const url = document.getElementById("srcInput").value.trim();
+        if (!url) return;
+
+        player.src({
+          src: url,
+          type: "application/x-mpegURL",
+        });
+
+        player.play();
+      }
+
+      // ========================
+      // STATS UPDATE PANEL
+      // ========================
+      const statsBox = document.getElementById("statsBox");
+
+      function updateStats() {
+        const tech = player.tech({ IWillNotUseThisInPlugins: true });
+        const videoEl = tech.el();
+
+        const resolution =
+          videoEl.videoWidth && videoEl.videoHeight
+            ? `${videoEl.videoWidth}x${videoEl.videoHeight}`
+            : "n/a";
+
+        const bufferedEnd = player.bufferedEnd ? player.bufferedEnd() : 0;
+        const bufferSec = (bufferedEnd - player.currentTime()).toFixed(2);
+
+        const dropped = videoEl.getVideoPlaybackQuality
+          ? videoEl.getVideoPlaybackQuality().droppedVideoFrames
+          : "N/A";
+
+        statsBox.innerHTML = `
+        Resolution: ${resolution}<br>
+        Buffer: ${bufferSec}s<br>
+        Dropped Frames: ${dropped}
+      `;
+      }
+
+      setInterval(updateStats, 1000);
+    </script>
+  </body>
+</html>
