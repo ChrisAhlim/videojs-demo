@@ -113,6 +113,12 @@
     <script>
       const player = videojs("videojs-player", {
         fluid: true,
+        html5: {
+          vhs: {
+            enableLowInitialPlaylist: false,
+            limitRenditionByPlayerDimensions: false,
+          },
+        },
       });
 
       // ============================
