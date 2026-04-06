@@ -113,6 +113,13 @@
     <script>
       const player = videojs("videojs-player", {
         liveui: true,
+        controlBar: {
+          progressControl: true,
+          currentTimeDisplay: true,
+          timeDivider: true,
+          durationDisplay: true,
+          remainingTimeDisplay: false,
+        },
         fluid: true,
         html5: {
           vhs: {
@@ -188,11 +195,11 @@
 
         // Display
         statsBox.innerHTML = `
-    Resolution: ${resolution}<br>
-    Bitrate: ${bitrate}<br>
-    Buffer: ${bufferSec}s<br>
-    Dropped Frames: ${dropped}
-  `;
+        Resolution: ${resolution}<br>
+        Bitrate: ${bitrate}<br>
+        Buffer: ${bufferSec}s<br>
+        Dropped Frames: ${dropped}
+      `;
       }
 
       setInterval(updateStats, 1000);
