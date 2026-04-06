@@ -49,6 +49,9 @@
         color: rgb(166, 255, 0);
         z-index: 100;
       }
+      .videojs-player-dimensions {
+        height: 300px !important;
+      }
     </style>
   </head>
 
@@ -133,28 +136,48 @@
         const tech = player.tech({ IWillNotUseThisInPlugins: true });
         const videoEl = tech.el();
 
+        // Resolution
         const resolution =
           videoEl.videoWidth && videoEl.videoHeight
             ? `${videoEl.videoWidth}x${videoEl.videoHeight}`
             : "n/a";
 
+        // Buffer
         const bufferedEnd = player.bufferedEnd ? player.bufferedEnd() : 0;
         const bufferSec = (bufferedEnd - player.currentTime()).toFixed(2);
 
+        // Dropped frames
         const dropped = videoEl.getVideoPlaybackQuality
           ? videoEl.getVideoPlaybackQuality().droppedVideoFrames
           : "N/A";
 
-        const bitrate = tech?.vhs?.bandwidth
-          ? (tech.vhs.bandwidth / 1000).toFixed(2) + " kbps"
-          : "N/A";
+        // =========================
+        // BITRATE (HLS / VHS)
+        // =========================
+        let bitrate = "N/A";
 
+        try {
+          const vhs = player.tech().vhs;
+
+          if (vhs && vhs.playlists && vhs.playlists.media()) {
+            const playlist = vhs.playlists.media();
+
+            if (playlist.attributes && playlist.attributes.BANDWIDTH) {
+              bitrate =
+                (playlist.attributes.BANDWIDTH / 1000).toFixed(0) + " kbps";
+            }
+          }
+        } catch (e) {
+          bitrate = "N/A";
+        }
+
+        // Display
         statsBox.innerHTML = `
-        Resolution: ${resolution}<br>
-        Buffer: ${bufferSec}s<br>
-        Dropped Frames: ${dropped} <br>
-        Bitrate: ${bitrate}
-      `;
+    Resolution: ${resolution}<br>
+    Bitrate: ${bitrate}<br>
+    Buffer: ${bufferSec}s<br>
+    Dropped Frames: ${dropped}
+  `;
       }
 
       setInterval(updateStats, 1000);
