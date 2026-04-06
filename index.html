@@ -145,10 +145,15 @@
           ? videoEl.getVideoPlaybackQuality().droppedVideoFrames
           : "N/A";
 
+        const bitrate = tech?.vhs?.bandwidth
+          ? (tech.vhs.bandwidth / 1000).toFixed(2) + " kbps"
+          : "N/A";
+
         statsBox.innerHTML = `
         Resolution: ${resolution}<br>
         Buffer: ${bufferSec}s<br>
-        Dropped Frames: ${dropped}
+        Dropped Frames: ${dropped} <br>
+        Bitrate: ${bitrate}
       `;
       }
 
