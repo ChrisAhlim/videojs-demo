@@ -113,12 +113,15 @@
     <script>
       const player = videojs("videojs-player", {
         liveui: true,
+        liveTracker: {
+          trackingThreshold: 0,
+        },
         controlBar: {
           progressControl: true,
           currentTimeDisplay: true,
           timeDivider: true,
           durationDisplay: true,
-          remainingTimeDisplay: false,
+          // remainingTimeDisplay: ,
         },
         fluid: true,
         html5: {
@@ -127,6 +130,28 @@
             limitRenditionByPlayerDimensions: false,
           },
         },
+      });
+
+      player.ready(() => {
+        player.on("loadedmetadata", () => {
+          console.log("currentSrc:", player.currentSrc());
+          console.log("duration:", player.duration());
+          console.log("seekable:", player.seekable());
+          console.log("buffered:", player.buffered());
+
+          const s = player.seekable();
+          console.log("seekable length:", s.length);
+
+          if (s.length > 0) {
+            console.log("seekable start:", s.start(0));
+            console.log("seekable end:", s.end(0));
+            console.log("window size:", s.end(0) - s.start(0));
+          }
+
+          console.log("isLive:", player.liveTracker?.isLive?.());
+          console.log("atLiveEdge:", player.liveTracker?.atLiveEdge?.());
+          console.log("liveWindow:", player.liveTracker?.liveWindow?.());
+        });
       });
 
       // ============================
@@ -203,6 +228,19 @@
       }
 
       setInterval(updateStats, 1000);
+
+      setInterval(() => {
+        const s = player.seekable();
+        console.log("seekable length:", s.length);
+
+        if (s.length > 0) {
+          console.log("seekable start:", s.start(0));
+          console.log("seekable end:", s.end(0));
+          console.log("window size:", s.end(0) - s.start(0));
+        }
+
+        console.log("liveWindow:", player.liveTracker?.liveWindow?.());
+      }, 3000);
     </script>
   </body>
 </html>
